@@ -11,7 +11,6 @@ import warnings
 
 def getBinSignal(s):
 	n = np.size(s)
-	#sbin = np.zeros(16*n)
 	sbin = 0
 	for i in range(n):
 		aux = '{0:016b}'.format(s[i])
@@ -25,9 +24,49 @@ def getBinSignal(s):
 				sbin = np.append(sbin, float(aux[j]))
 
 
-	sbin = sbin[1:np.size(sbin)-1].ravel()
+	sbin = sbin[1:np.size(sbin)].ravel()
 	sbin = np.array(sbin)
 	return sbin
+
+
+def ASKmod(s, fs):
+	fs = 16*fs
+	A = 5
+	B = 10
+	n = np.size(s)
+	#T = n/fs     #Tiempo
+	t = np.arange(0, 1, 1/n)
+	c1 = A*np.cos(2*np.pi*fs*t)
+	c2 = B*np.cos(2*np.pi*fs*t)
+	smod = 0
+
+	for i in range(n):
+		if s[i]==0:
+			smod = np.append(smod, c1[i]*s[i])
+		else:
+			smod = np.append(smod, c2[i]*s[i])
+	smod = smod[1:np.size(smod)].ravel()
+	smod = np.array(smod)
+
+
+	f, axarr = matplot.subplots(3)
+	axarr[0].set_title('Señal Digital Original')
+	axarr[0].step(t, s)
+	axarr[0].set_ylabel('Amplitud')
+	axarr[1].set_title('Portadoras')
+	axarr[1].plot(t, c1, color='red')
+	axarr[1].plot(t, c2, color='blue')
+	blue_patch = mpatches.Patch(color='blue', label='Portadora 1')
+	red_patch = mpatches.Patch(color='red', label='Portadora 2')
+	axarr[1].legend(handles=[blue_patch, red_patch])
+	axarr[1].set_ylabel('Amplitud')
+	axarr[2].set_title('Señal ASK')
+	axarr[2].plot(t, smod)
+	axarr[2].set_ylabel('Amplitud')
+	matplot.tight_layout()
+	matplot.show()
+
+	return smod
 
 
 
@@ -37,18 +76,21 @@ if __name__ == '__main__':
 	f, s = wav.read('handel.wav')
 	Amax = np.amax(abs(s))
 	s = s[5000:5100]
+	sbin = getBinSignal(s)
 
-	F1 = 10000
-	F2 = 50
-	A = 5
-	B = 10
-	n = np.size(s)
-	t = np.arange(0, n, 1)
-	#c = A*np.sin(2*np.pi*F1*t)+(A/2)
-	c1 = A*np.cos(2*np.pi*F1*t)
-	c2 = B*np.cos(2*np.pi*F1*t)
-	u = (A/2)*signal.square(2*np.pi*F2*t)+(A/2)
-	v = c1*u
+	ASKmod(sbin, f)
+
+	# F1 = 10000
+	# F2 = 50
+	# A = 5
+	# B = 10
+	# n = np.size(s)
+	# t = np.arange(0, n, 1)
+	# #c = A*np.sin(2*np.pi*F1*t)+(A/2)
+	# c1 = A*np.cos(2*np.pi*F1*t)
+	# c2 = B*np.cos(2*np.pi*F1*t)
+	# u = (A/2)*signal.square(2*np.pi*F2*t)+(A/2)
+	# v = c1*u
 
 	# f, axarr = matplot.subplots(4)
 	# axarr[0].set_title('Señal')
@@ -68,10 +110,13 @@ if __name__ == '__main__':
 	# matplot.tight_layout()
 	# matplot.show()
 
-	sbin = getBinSignal(s)
-	print('{0:016b}'.format(s[0]))
-	print('{0:016b}'.format(s[1]))
+	# sbin = getBinSignal(s)
+	# print('{0:016b}'.format(s[0]))
+	# print('{0:016b}'.format(s[1]))
 	
 
-	print(sbin[0:16])
-	print(sbin[16:32])
+	# print(sbin[0:16])
+	# print(sbin[16:32])
+
+	# matplot.step(range(32), sbin[0:32])
+	# matplot.show()

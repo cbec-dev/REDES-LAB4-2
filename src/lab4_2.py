@@ -68,7 +68,17 @@ def ASKmod(s, fs):
 
 	return smod
 
-
+def deMOD(smod, A, B):
+	n = np.size(smod)
+	sdemod = 0.0
+	for i in range(n):
+		if abs(smod[i])>A:
+			sdemod = np.append(sdemod, 1)
+		else:
+			sdemod = np.append(sdemod, 0)
+	sdemod = sdemod[1:np.size(sdemod)].ravel()
+	sdemod = np.array(sdemod)
+	return sdemod 
 
 if __name__ == '__main__':
 
@@ -78,7 +88,18 @@ if __name__ == '__main__':
 	s = s[5000:5100]
 	sbin = getBinSignal(s)
 
-	ASKmod(sbin, f)
+	smod = ASKmod(sbin, f)
+
+	sdemod = deMOD(smod, 5, 10)
+
+	print(sbin[0:16])
+	print(smod[0:16])
+	print(sdemod[0:16])
+
+
+
+
+
 
 	# F1 = 10000
 	# F2 = 50
